@@ -217,6 +217,8 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
   }, [dispatchAppUpdate, setOnDisconnect]);
 
   const page = useMemo(() => {
+    // if user not auth, login page
+    // if no sessionToken, home page
     if (!appState.sessionToken) {
       return <Login doLogin={setupGameController} />;
     } if (!videoInstance) {

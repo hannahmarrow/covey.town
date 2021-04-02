@@ -31,10 +31,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
   },
   localPreviewContainer: {
-    paddingRight: '2em',
-    [theme.breakpoints.down('sm')]: {
-      padding: '0 2.5em',
-    },
+    width: '100%',
   },
   joinButtons: {
     display: 'flex',
@@ -78,7 +75,7 @@ export default function DeviceSelectionScreen({ setMediaError }: DeviceSelection
   return (
     <>
       <Grid container justify="center" aria-label="join video room form">
-        <Grid item md={7} sm={12} xs={12}>
+        <Grid item sm={12} xs={12}>
           <div className={classes.localPreviewContainer}>
             <LocalVideoPreview identity="" />
           </div>
@@ -98,7 +95,7 @@ export default function DeviceSelectionScreen({ setMediaError }: DeviceSelection
             <SettingsMenu mobileButtonClass={classes.mobileButton} />
           </div>
         </Grid>
-        <Grid item md={5} sm={12} xs={12}>
+        <Grid item sm={12} xs={12}>
           <Grid container direction="column" justify="space-between" style={{ height: '100%' }}>
             <div>
               <Hidden smDown>

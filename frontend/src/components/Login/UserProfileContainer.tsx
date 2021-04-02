@@ -4,7 +4,7 @@ import { makeStyles, Theme } from '@material-ui/core';
 const useStyles = makeStyles((theme: Theme) => ({
   background: {
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'top',
     justifyContent: 'center',
     height: '100%',
   },
@@ -14,10 +14,11 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   innerContainer: {
     display: 'block',
-    height: 'auto',
-    width: 'calc(100% - 40px)',
+    maxHeight: '865px',
+    width: '350px',
     margin: '10px auto',
-    maxWidth: '1200px',
+    maxWidth: '400px',
+    minWidth: '200px',
 
     borderRadius: '8px',
     border: '1px solid #ccc',
@@ -27,7 +28,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   content: {
     background: 'white',
     width: '100%',
-    padding: '2em',
+    padding: '0.5em',
     flex: 1,
   },
   subContentContainer: {
@@ -36,12 +37,12 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-interface IntroContainerProps {
+interface UserProfileContainerProps {
   children: React.ReactNode;
   subContent?: React.ReactNode;
 }
 
-const IntroContainer = (props: IntroContainerProps) => {
+const UserProfileContainer = (props: UserProfileContainerProps) => {
   const classes = useStyles();
 
   return (
@@ -56,4 +57,4 @@ const IntroContainer = (props: IntroContainerProps) => {
   );
 };
 
-export default IntroContainer;
+export default UserProfileContainer;
