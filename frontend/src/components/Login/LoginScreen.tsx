@@ -1,32 +1,43 @@
 import React, { useState } from 'react';
 import { Box, Heading, Text, FormControl, FormLabel, Input, Button } from '@chakra-ui/react';
+import firebase from 'firebase';
+import CreateAccount from './CreateAccount';
+
 
 export default function LoginScreen(): JSX.Element {
-    const [userName, setUserName] = useState<string>('');
+    const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
+
+    const continueAsGuest = () => {
+      firebase.auth().signInAnonymously()
+    };
+
+    const login = () => {
+      firebase.auth().signInWithEmailAndPassword(email, password);
+    };
 
     return (
         <Box p="4" borderWidth="1px" borderRadius="lg">
             <Heading as="h2" size="xl">Welcome to Covey.Town!</Heading>
             <Text>A new, open source app for hanging out with your friends and meeting new people</Text>
-            <Text>Please enter a username. Then either join as a guest, or enter your password and log in.</Text>
+            <Text>Please log in with your email and password, or join as a guest.</Text>
             <FormControl>
-              <FormLabel htmlFor="username">Username</FormLabel>
-              <Input autoFocus name="username" placeholder="Your username"
-                     value={userName}
-                     onChange={event => setUserName(event.target.value)}
+              <FormLabel htmlFor="emailTextbox">Email</FormLabel>
+              <Input autoFocus name="emailTextbox" placeholder="Your Email"
+                     value={email}
+                     onChange={event => setEmail(event.target.value)}
               />
-              <Button size="xs">Continue As Guest</Button>
+              <Button size="xs" onClick={continueAsGuest}>Continue As Guest</Button>
             </FormControl>
             <FormControl>
-              <FormLabel htmlFor="password">Password</FormLabel>
-              <Input autoFocus name="password" placeholder="Your password"
+              <FormLabel htmlFor="passwordTextBox">Password</FormLabel>
+              <Input autoFocus name="passwordTextBox" placeholder="Your password"
                      value={password}
                      onChange={event => setPassword(event.target.value)}
               />
             </FormControl>
-            <Button colorScheme="blue">Log In</Button>
-            <Button colorScheme="green">Create a New Account</Button>
+            <Button colorScheme="blue" onClick={login}>Log In</Button>
+            <CreateAccount/>
         </Box>
     )
 }

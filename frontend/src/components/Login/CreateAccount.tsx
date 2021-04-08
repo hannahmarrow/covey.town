@@ -28,9 +28,7 @@ const CreateAccount: React.FunctionComponent = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     return <>
-    <MenuItem data-testid='openMenuButton' onClick={onOpen}>
-      <Typography variant="body1">Create Account</Typography>
-    </MenuItem>
+    <Button data-testid='openButton' width="100%" onClick={onOpen}>Create New Account</Button>
     <Modal closeOnOverlayClick={false} isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>

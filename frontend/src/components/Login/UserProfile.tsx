@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import assert from "assert";
 import { makeStyles } from '@material-ui/core';
 import {
@@ -21,9 +21,15 @@ import {
   Tr,
   useToast
 } from '@chakra-ui/react';
+import firebase from "firebase/app";
+import "firebase/auth";
 import useVideoContext from '../VideoCall/VideoFrontend/hooks/useVideoContext/useVideoContext';
 import Video from '../../classes/Video/Video';
 import useCoveyAppState from '../../hooks/useCoveyAppState';
+import CreateAccount from './CreateAccount';
+import EditAccount from './EditAccount';
+import DisplayNameContext from '../../contexts/DisplayNameContext';
+
 
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -40,9 +46,11 @@ export type FriendRequest = { username: string, id: string };
 
 export default function UserProfile(): JSX.Element {
   const classes = useStyles();
-  const username = 'l33r_h4ck3rz';
-  const guest = false;
-  const [displayName, setDisplayName] = useState<string>(username);
+
+  // check if current user is guest
+  const guest = firebase.auth().currentUser?.isAnonymous;
+  const username = (guest ? 'guest' : 'not guest');
+  const {displayName, setDisplayName} = useContext(DisplayNameContext);
   let friends: FriendList = [{ username: "test_friend", isOnline: true, coveyTownID: "AN5HB2G", }, 
   { username: "test2", isOnline: false }, { username: "test3", isOnline: false }, { username: "test4", isOnline: true, coveyTownID: "RTYU43F2" }, { username: "test5", isOnline: false }];
   const [onlineFriends, setOnlineFriends] = useState<FriendList>([]);
@@ -121,14 +129,14 @@ export default function UserProfile(): JSX.Element {
       return (
       <>
         <Box>
-          <Button data-testid="createProfile" width="100%">Create New Profile</Button>
+          <CreateAccount/>
         </Box>
       </>);
     }
     return (
     <>
       <Box>
-        <Button data-testid="updateProfile" width="100%">Update Profile</Button>
+        <EditAccount />
       </Box>
       <Box>
         <HStack>
@@ -191,7 +199,10 @@ export default function UserProfile(): JSX.Element {
       <form>
         <Stack>
           <Box>
-            <h3>Username: {username}</h3>
+            <HStack>
+              <Box width="70%"><h3>Username: {username}</h3></Box>
+              <Box width="30%"><Button onClick={() => firebase.auth().signOut()}>Logout</Button></Box>
+            </HStack>
             <FormControl>
               <FormLabel htmlFor="name">Display Name</FormLabel>
               <Input name="name" placeholder="Please Enter Name" required

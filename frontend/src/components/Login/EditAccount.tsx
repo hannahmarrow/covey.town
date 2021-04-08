@@ -28,9 +28,7 @@ const EditAccount: React.FunctionComponent = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     return <>
-    <MenuItem data-testid='openMenuButton' onClick={onOpen}>
-      <Typography variant="body1">Edit Account</Typography>
-    </MenuItem>
+    <Button data-testid='openButton' width="100%" onClick={onOpen}>Edit Profile</Button>
     <Modal closeOnOverlayClick={false} isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>

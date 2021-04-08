@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import assert from "assert";
 import {
   Box,
@@ -23,12 +23,13 @@ import useVideoContext from '../VideoCall/VideoFrontend/hooks/useVideoContext/us
 import Video from '../../classes/Video/Video';
 import { CoveyTownInfo, TownJoinResponse, } from '../../classes/TownsServiceClient';
 import useCoveyAppState from '../../hooks/useCoveyAppState';
+import DisplayNameContext from '../../contexts/DisplayNameContext';
 
 interface TownSelectionProps {
   doLogin: (initData: TownJoinResponse) => Promise<boolean>
 }
 
-export default function TownSelection({ doLogin }: TownSelectionProps, displayName: string): JSX.Element {
+export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Element {
   // const [userName, setUserName] = useState<string>(Video.instance()?.userName || '');
   const [newTownName, setNewTownName] = useState<string>('');
   const [newTownIsPublic, setNewTownIsPublic] = useState<boolean>(true);
@@ -37,6 +38,7 @@ export default function TownSelection({ doLogin }: TownSelectionProps, displayNa
   const { connect } = useVideoContext();
   const { apiClient } = useCoveyAppState();
   const toast = useToast();
+  const {displayName, setDisplayName} = useContext(DisplayNameContext);
 
   const updateTownListings = useCallback(() => {
     apiClient.listTowns()
@@ -56,8 +58,7 @@ export default function TownSelection({ doLogin }: TownSelectionProps, displayNa
 
   const handleJoin = useCallback(async (coveyRoomID: string) => {
     try {
-      // get displayName (username) from firebase
-      const userName = "l33t_h4ck3rz";
+      const userName = displayName;
       if (!userName || userName.length === 0) {
         toast({
           title: 'Unable to join town',
@@ -66,6 +67,7 @@ export default function TownSelection({ doLogin }: TownSelectionProps, displayNa
         });
         return;
       }
+      // if user is NOT guest, store displayName in database
       if (!coveyRoomID || coveyRoomID.length === 0) {
         toast({
           title: 'Unable to join town',
@@ -88,11 +90,11 @@ export default function TownSelection({ doLogin }: TownSelectionProps, displayNa
         status: 'error'
       })
     }
-  }, [doLogin, connect, toast]);
+  }, [doLogin, connect, toast, displayName]);
 
   const handleCreate = async () => {
     // get displayName (username) from firebase
-    const userName = "l33t_h4ck3rz";
+    const userName = displayName;
     if (!userName || userName.length === 0) {
       toast({
         title: 'Unable to create town',
