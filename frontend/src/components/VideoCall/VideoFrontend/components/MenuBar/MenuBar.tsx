@@ -1,6 +1,7 @@
 import React from 'react';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-
+import firebase from "firebase/app";
+import "firebase/auth";
 import Button from '@material-ui/core/Button';
 import { Typography, Grid, Hidden } from '@material-ui/core';
 import EndCallButton from '../Buttons/EndCallButton/EndCallButton';
@@ -14,6 +15,7 @@ import ToggleVideoButton from '../Buttons/ToggleVideoButton/ToggleVideoButton';
 import ToggleScreenShareButton from '../Buttons/ToogleScreenShareButton/ToggleScreenShareButton';
 import TownSettings from '../../../../Login/TownSettings';
 import MenuContainer from '@material-ui/core/Menu';
+import { Box } from '@chakra-ui/react';
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   container: {
@@ -92,8 +94,8 @@ export default function MenuBar(props: { setMediaError?(error: Error): void }) {
             <Grid style={{ flex: 1 }}>
               <Grid container justify="flex-end">
                 <TownSettings />
-
                 <Menu />
+                <Box><Button onClick={() => firebase.auth().signOut()}>Logout</Button></Box>
                 <EndCallButton />
               </Grid>
             </Grid>
