@@ -12,7 +12,7 @@ import Video from '../../../../../classes/Video/Video';
 
 export default function PreJoinScreens(props: { doLogin: (initData: TownJoinResponse) => Promise<boolean>; setMediaError?(error: Error): void }) {  
   // get database displayName if user is NOT guest
-  const databaseDisplayName = 'l33t_h4ck3rz';
+  const databaseDisplayName = '';
   const [displayName, setDisplayName] = useState(Video.instance()?.userName || databaseDisplayName);
   
   return (
