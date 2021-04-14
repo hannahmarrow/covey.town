@@ -167,7 +167,7 @@ const CreateAccount: React.FunctionComponent = () => {
           allUsernames.push(username);
           firebase.database().ref('allUsernames').push(username);
 
-          closeModal();
+          onClose();
         }
       }
     }
