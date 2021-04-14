@@ -53,11 +53,11 @@ else {
 let username = '';
 let displayname = '';
 let friends: FriendList = [];
-const friendNames: string[] = [];
-const friendRequestsSent: FriendList = [];
-const friendRequestsSentNames: string[] = [];
-const friendRequestsRecieved: FriendList = [];
-const friendRequestsRecievedNames: string[] = [];
+let friendNames: string[] = [];
+let friendRequestsSent: FriendList = [];
+let friendRequestsSentNames: string[] = [];
+let friendRequestsRecieved: FriendList = [];
+let friendRequestsRecievedNames: string[] = [];
 
 
 // reads all the users data, sets
@@ -79,7 +79,6 @@ async function readUserData() {
         currentFriends = snapshot.val().friendsList
         currentFriendsSent = snapshot.val().friendsRequestsSent
         currentFriendsReceived = snapshot.val().friendsRequestsReceived
-        console.log(currentFriendsSent)
       }
       else {
         console.log("No data available");
@@ -168,6 +167,20 @@ async function setFriendRequestReceived(givenUsername: string, curUsername: stri
   });
 }
 
+// handles all logging out; resets data and de-auths firebase
+function logout() {
+
+  firebase.auth().signOut()
+
+  username = ''
+  friends = [];
+  friendNames = [];
+  friendRequestsSent= [];
+  friendRequestsSentNames = [];
+  friendRequestsRecieved = [];
+  friendRequestsRecievedNames= [];
+}
+
 const useStyles = makeStyles((theme: Theme) => ({
   rightJustify: {
     float: "right",
@@ -251,9 +264,9 @@ export default function UserProfile(): JSX.Element {
     // if the friend being targetted by the request is not currently friends with the user, they haven't already been sent
     // a request, they exist, and it isn't the current users username; the request goes through
     if (currentFriendsList !== undefined && currentFriendsList !== null) {
-      if (currentFriendsList.indexOf(friendName) === -1 && currentFriendResquestsSent.indexOf(friendName) === -1 &&
+      if (getValuesFromFirebaseArray(currentFriendsList).indexOf(friendName) === -1 && currentFriendResquestsSent.indexOf(friendName) === -1 &&
           allUsernames.indexOf(friendName) !== -1 && currentUsername !== friendName) {
-        firebase.database().ref('users').child(user!.uid).child("friendRequestsSent").push(friendName);
+        firebase.database().ref('users').child(user!.uid).child("friendsRequestsSent").push(friendName);
         await setFriendRequestReceived(friendName, currentUsername)
       }
     }
@@ -384,7 +397,7 @@ export default function UserProfile(): JSX.Element {
           <Box>
             <HStack>
               <Box width="70%"><h3>Username: {username}</h3></Box>
-              <Box width="30%"><Button onClick={() => firebase.auth().signOut()}>Logout</Button></Box>
+              <Box width="30%"><Button onClick={logout}>Logout</Button></Box>
             </HStack>
             <FormControl>
               <FormLabel htmlFor="name">Display Name</FormLabel>
