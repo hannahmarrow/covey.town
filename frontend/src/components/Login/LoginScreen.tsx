@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Box, Heading, Text, FormControl, FormLabel, Input, Button, VStack } from '@chakra-ui/react';
+import { Box, Heading, Text, FormControl, FormLabel, Input, Button, VStack, useToast } from '@chakra-ui/react';
 import firebase from 'firebase';
 import { makeStyles, Theme } from '@material-ui/core';
 import CreateAccount from './CreateAccount';
+
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -10,10 +11,10 @@ const useStyles = makeStyles((theme: Theme) => ({
     width: '50%'
   },
   emailField: {
-    width: '75%',
+    width: '100%',
   },
   passwordField: {
-    width: '75%',
+    width: '100%',
   },
   continueAsGuestBtn: {
     margin: '0 0 5px 0',
@@ -27,13 +28,45 @@ export default function LoginScreen(): JSX.Element {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const classes = useStyles();
+    const toast = useToast();
 
     const continueAsGuest = () => {
       firebase.auth().signInAnonymously()
     };
 
     const login = () => {
-      firebase.auth().signInWithEmailAndPassword(email, password);
+      firebase.auth().signInWithEmailAndPassword(email, password).catch((error) => {
+        // Handle Errors here.
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        if (errorCode === 'auth/wrong-password' || errorCode === 'auth/user-not-found') {
+          toast({
+            title: 'Unable to Login',
+            description: 'Email and/or password does not match our records.',
+            status: 'error',
+            position: 'top',
+            isClosable: true,
+          });
+        } else if (errorCode === 'auth/invalid-email') {
+          toast({
+            title: 'Unable to Login',
+            description: 'Email is not correctly formatted.',
+            status: 'error',
+            position: 'top',
+            isClosable: true,
+          });
+        } else {
+          toast({
+            title: 'Unable to Login',
+            description: errorMessage,
+            status: 'error',
+            position: 'top',
+            isClosable: true,
+          });
+        }
+         
+        console.log(error);
+      });
     };
 
     return (
@@ -43,11 +76,12 @@ export default function LoginScreen(): JSX.Element {
             <Text>A new, open source app for hanging out with your friends and meeting new people</Text>
             <Text>Please log in with your email and password, or join as a guest.</Text>
             <br/>
+            <div className={classes.container}>
             <VStack spacing="10px">
             <FormControl>
               <FormLabel htmlFor="emailTextbox">Email</FormLabel>
               <div className={classes.emailField}>
-                <Input autoFocus name="emailTextbox" placeholder="Your Email"
+                <Input autoFocus id="emailTextbox" name="emailTextbox" placeholder="Your Email"
                         value={email}
                         onChange={event => setEmail(event.target.value)}
                 />
@@ -56,7 +90,7 @@ export default function LoginScreen(): JSX.Element {
             <FormControl>
               <FormLabel htmlFor="passwordTextBox">Password</FormLabel>
               <div className={classes.passwordField}>
-                <Input autoFocus name="passwordTextBox" placeholder="Your password"
+                <Input id="passwordTextBox" name="passwordTextBox" placeholder="Your password"
                         value={password}
                         onChange={event => setPassword(event.target.value)}
                 />
@@ -70,6 +104,7 @@ export default function LoginScreen(): JSX.Element {
                 <Button size="xs" onClick={continueAsGuest}>Continue As Guest</Button>
             </div>
             </VStack>
+            </div>
         </Box>
       </div>
     )
