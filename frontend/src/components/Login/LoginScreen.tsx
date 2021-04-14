@@ -90,18 +90,18 @@ export default function LoginScreen(): JSX.Element {
             <FormControl>
               <FormLabel htmlFor="passwordTextBox">Password</FormLabel>
               <div className={classes.passwordField}>
-                <Input id="passwordTextBox" name="passwordTextBox" placeholder="Your password"
+                <Input id="passwordTextBox" type="password" name="passwordTextBox" placeholder="Your password"
                         value={password}
                         onChange={event => setPassword(event.target.value)}
                 />
               </div>
             </FormControl>
             <div className={classes.loginInBtn}>
-              <Button colorScheme="blue" isFullWidth onClick={login}>Log In</Button>
+              <Button colorScheme="blue" isFullWidth onClick={login} type="submit">Log In</Button>
             </div>
             <CreateAccount/>
             <div className={classes.continueAsGuestBtn}>
-                <Button size="xs" onClick={continueAsGuest}>Continue As Guest</Button>
+              <Button size="xs" onClick={continueAsGuest}>Continue As Guest</Button>
             </div>
             </VStack>
             </div>
