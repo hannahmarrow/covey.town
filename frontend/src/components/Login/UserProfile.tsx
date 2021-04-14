@@ -52,24 +52,42 @@ else {
 
 let username = '';
 let displayname = '';
+let friends: FriendList = [];
+const friendNames: string[] = [];
+const friendRequestsSent: FriendList = [];
+const friendRequestsSentNames: string[] = [];
+const friendRequestsRecieved: FriendList = [];
+const friendRequestsRecievedNames: string[] = [];
+
 
 // reads all the users data, sets
 async function readUserData() {
   
   const user = await firebase.auth().currentUser
 
+  let currentFriends: any = []
+  let currentFriendsSent: any = []
+  let currentFriendsReceived: any = []
+
   if (user !== null && user !== undefined) {
 
-    firebase.database().ref('users').child(user!.uid).get().then((snapshot) => {
+    await firebase.database().ref('users').child(user!.uid).get().then((snapshot) => {
       if (snapshot.exists()) {
         console.log(snapshot.val());
         username = snapshot.val().username
         displayname = snapshot.val().displayname
+        currentFriends = snapshot.val().friendsList
+        currentFriendsSent = snapshot.val().friendsRequestsSent
+        currentFriendsReceived = snapshot.val().friendsRequestsReceived
+        console.log(currentFriendsSent)
       }
       else {
         console.log("No data available");
         username = 'GUEST'
         displayname = 'GUEST'
+        currentFriends = []
+        currentFriendsSent = []
+        currentFriendsReceived = []
       }
     }).catch((error) => {
       console.error(error);
@@ -78,6 +96,43 @@ async function readUserData() {
   else {
     username = 'GUEST'
     displayname = 'GUEST'
+    currentFriends = []
+    currentFriendsSent = []
+    currentFriendsReceived = []
+  }
+
+  // adds all friends to friendsList
+  if (currentFriends !== undefined && currentFriends !== null) {
+    Object.keys(currentFriends).forEach((key) => {
+      const val = currentFriends[key];
+      if (friendNames.indexOf(val) === -1) {
+        friends.push({  username: val, isOnline: true })
+        friendNames.push(val)
+      }
+    })
+  }
+
+   // adds all friend requests sent to list
+   if (currentFriendsReceived !== undefined && currentFriendsReceived !== null) {
+    Object.keys(currentFriendsReceived).forEach((key) => {
+      const val = currentFriendsReceived[key];
+      if (friendRequestsRecievedNames.indexOf(val) === -1) {
+        friendRequestsRecieved.push({  username: val, isOnline: true })
+        friendRequestsRecievedNames.push(val)
+      }
+    })
+  }
+
+   // adds all friend requests received to list
+   
+   if (currentFriendsSent !== undefined && currentFriendsSent !== null) {
+    Object.keys(currentFriendsSent).forEach((key) => {
+      const val = currentFriendsSent[key];
+      if (friendRequestsSentNames.indexOf(val) === -1) {
+        friendRequestsSent.push({  username: val, isOnline: true })
+        friendRequestsSentNames.push(val)
+      }
+    })
   }
 }
 
@@ -101,7 +156,7 @@ async function setFriendRequestReceived(givenUsername: string, curUsername: stri
       Object.keys(snapshot.val()).forEach((key) => {
         const val = snapshot.val()[key];
         if (val.username === givenUsername) {
-          firebase.database().ref('users').child(key).child("friendRequestsReceived").push(curUsername);
+          firebase.database().ref('users').child(key).child("friendsRequestsReceived").push(curUsername);
         }
       })
     }
@@ -131,12 +186,8 @@ export default function UserProfile(): JSX.Element {
   // check if current user is guest
   const guest = firebase.auth().currentUser?.isAnonymous;
   const {displayName, setDisplayName} = useContext(DisplayNameContext);
-  let friends: FriendList = [{ username: "test_friend", isOnline: true, coveyTownID: "AN5HB2G", }, 
-  { username: "test2", isOnline: false }, { username: "test3", isOnline: false }, { username: "test4", isOnline: true, coveyTownID: "RTYU43F2" }, { username: "test5", isOnline: false }];
   const [onlineFriends, setOnlineFriends] = useState<FriendList>([]);
   const [offlineFriends, setOfflineFriends] = useState<FriendList>([]);
-  const [friendRequestsSent, setFriendRequestsSent] = useState<FriendList>([]);
-  const [friendRequestsRecieved, setFriendRequestsRecieved] = useState<FriendList>([]);
   const [friendName, setFriendName] = useState<string>('');
 
   readUserData()
@@ -199,10 +250,12 @@ export default function UserProfile(): JSX.Element {
 
     // if the friend being targetted by the request is not currently friends with the user, they haven't already been sent
     // a request, they exist, and it isn't the current users username; the request goes through
-    if (currentFriendsList.indexOf(friendName) === -1 && currentFriendResquestsSent.indexOf(friendName) === -1 &&
-        allUsernames.indexOf(friendName) !== -1 && currentUsername !== friendName) {
-      firebase.database().ref('users').child(user!.uid).child("friendRequestsSent").push(friendName);
-      await setFriendRequestReceived(friendName, currentUsername)
+    if (currentFriendsList !== undefined && currentFriendsList !== null) {
+      if (currentFriendsList.indexOf(friendName) === -1 && currentFriendResquestsSent.indexOf(friendName) === -1 &&
+          allUsernames.indexOf(friendName) !== -1 && currentUsername !== friendName) {
+        firebase.database().ref('users').child(user!.uid).child("friendRequestsSent").push(friendName);
+        await setFriendRequestReceived(friendName, currentUsername)
+      }
     }
   }
 
@@ -242,12 +295,6 @@ export default function UserProfile(): JSX.Element {
     // filter online and offline friends
     setOnlineFriends(friends.filter((friend) => friend.isOnline === true));
     setOfflineFriends(friends.filter((friend) => friend.isOnline === false));
-
-    // get updated friendRequestsSent list (no sort)
-    setFriendRequestsSent(friends);
-
-    // get updated friendRequestsRecieved list (no sort)
-    setFriendRequestsRecieved(friends);
 
 
   }, [setOnlineFriends, setOfflineFriends]);
