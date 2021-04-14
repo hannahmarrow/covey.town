@@ -37,7 +37,7 @@ const firebaseConfig = {
 // initialize firebase
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
-}  
+}
 else {
   firebase.app();
 }
@@ -94,11 +94,11 @@ const CreateAccount: React.FunctionComponent = () => {
 
       // confirm username is unique
       let allUsernames: any = []
-      await firebase.database().ref('/').get().then((snapshot) => { 
+      await firebase.database().ref('/').get().then((snapshot) => {
         if (snapshot.exists()) {
           console.log(snapshot.val());
           allUsernames = snapshot.val().allUsernames;
-        } 
+        }
       });
 
       const allUsernamesList: any[] = []
@@ -172,9 +172,9 @@ const CreateAccount: React.FunctionComponent = () => {
           const user = firebase.auth().currentUser;
 
           if (user !== null && user !== undefined) {
-        
+
             firebase.database().ref('users').child(user!.uid).set({
-                username, 
+                username,
                 displayname: displayName,
                 email,
                 friendsList: [],
@@ -183,13 +183,13 @@ const CreateAccount: React.FunctionComponent = () => {
                 friendsRequestsSent: [],
                 friendsRequestsReceived: [],
             });
-      
+
             let allUsernames = [];
-            firebase.database().ref('/').get().then((snapshot) => { 
+            firebase.database().ref('/').get().then((snapshot) => {
               if (snapshot.exists()) {
                 console.log(snapshot.val());
                 allUsernames = snapshot.val().allUsernames;
-              } 
+              }
             });
             allUsernames.push(username);
             firebase.database().ref('allUsernames').push(username);
@@ -213,7 +213,7 @@ const CreateAccount: React.FunctionComponent = () => {
           <ModalBody pb={6}>
             <FormControl isRequired>
               <FormLabel htmlFor='username'>Username</FormLabel>
-              <Input id='username' name="username" 
+              <Input id='username' name="username"
               value={username}
               onChange={event => setUsername(event.target.value)}
               />
@@ -222,7 +222,7 @@ const CreateAccount: React.FunctionComponent = () => {
 
             <FormControl mt={4} isRequired>
               <FormLabel htmlFor='displayName'>Display Name</FormLabel>
-              <Input id="displayName" name="displayName" 
+              <Input id="displayName" name="displayName"
               value={displayName}
               onChange={event => setDisplayName(event.target.value)}
               />
@@ -253,7 +253,7 @@ const CreateAccount: React.FunctionComponent = () => {
 
             <FormControl mt={4} isRequired>
               <FormLabel htmlFor="confirmPassword">Confirm Password</FormLabel>
-              <Input id="confirmPassword" name="confirmPassword" type="password" 
+              <Input id="confirmPassword" name="confirmPassword" type="password"
               value={passConfirm} onChange={event => setpassConfirm(event.target.value)}/>
             </FormControl>
 
