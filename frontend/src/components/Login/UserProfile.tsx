@@ -280,6 +280,14 @@ export default function UserProfile(): JSX.Element {
     // add user.username to their friend list
   };
 
+  const initializeData = useCallback(() => {
+    readUserData().then(() => {
+      if (!guest) {
+        setDisplayName(displayname);
+      }
+    });
+  }, [readUserData, setDisplayName]);
+
   const updateFriendListing = useCallback(() => {
     // read user data then get updated friend list and sort by username alphabetically
     readUserData().then(() => {
@@ -304,6 +312,7 @@ export default function UserProfile(): JSX.Element {
 
   // update friend list every 10 seconds
   useEffect(() => {
+    initializeData();
     updateFriendListing();
     const timer = setInterval(updateFriendListing, 10000);
     return () => {
