@@ -1,18 +1,14 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import assert from "assert";
 import { makeStyles } from '@material-ui/core';
 import {
   Box,
   Button,
-  Flex,
   FormControl,
   FormLabel,
-  Heading,
   HStack,
   Input,
   Stack,
   Table,
-  TableCaption,
   Tbody,
   Td,
   Th,
@@ -23,9 +19,6 @@ import {
 } from '@chakra-ui/react';
 import firebase from "firebase/app";
 import "firebase/auth";
-import useVideoContext from '../VideoCall/VideoFrontend/hooks/useVideoContext/useVideoContext';
-import Video from '../../classes/Video/Video';
-import useCoveyAppState from '../../hooks/useCoveyAppState';
 import CreateAccount from './CreateAccount';
 import EditAccount from './EditAccount';
 import DisplayNameContext from '../../contexts/DisplayNameContext';
@@ -62,42 +55,40 @@ let friendRequestsRecievedNames: string[] = [];
 
 // reads all the users data, sets
 async function readUserData() {
-  
-  const user = await firebase.auth().currentUser
+  const user = firebase.auth().currentUser;
 
-  let currentFriends: any = []
-  let currentFriendsSent: any = []
-  let currentFriendsReceived: any = []
+  let currentFriends: any = [];
+  let currentFriendsSent: any = [];
+  let currentFriendsReceived: any = [];
 
   if (user !== null && user !== undefined) {
 
     await firebase.database().ref('users').child(user!.uid).get().then((snapshot) => {
       if (snapshot.exists()) {
         console.log(snapshot.val());
-        username = snapshot.val().username
-        displayname = snapshot.val().displayname
-        currentFriends = snapshot.val().friendsList
-        currentFriendsSent = snapshot.val().friendsRequestsSent
-        currentFriendsReceived = snapshot.val().friendsRequestsReceived
+        username = snapshot.val().username;
+        displayname = snapshot.val().displayname;
+        currentFriends = snapshot.val().friendsList;
+        currentFriendsSent = snapshot.val().friendsRequestsSent;
+        currentFriendsReceived = snapshot.val().friendsRequestsReceived;
       }
       else {
-        console.log("No data available");
-        username = 'GUEST'
-        displayname = 'GUEST'
-        currentFriends = []
-        currentFriendsSent = []
-        currentFriendsReceived = []
+        username = 'GUEST';
+        displayname = 'GUEST';
+        currentFriends = [];
+        currentFriendsSent = [];
+        currentFriendsReceived = [];
       }
     }).catch((error) => {
       console.error(error);
     });
   }
   else {
-    username = 'GUEST'
-    displayname = 'GUEST'
-    currentFriends = []
-    currentFriendsSent = []
-    currentFriendsReceived = []
+    username = 'GUEST';
+    displayname = 'GUEST';
+    currentFriends = [];
+    currentFriendsSent = [];
+    currentFriendsReceived = [];
   }
 
   // adds all friends to friendsList
@@ -105,52 +96,51 @@ async function readUserData() {
     Object.keys(currentFriends).forEach((key) => {
       const val = currentFriends[key];
       if (friendNames.indexOf(val) === -1) {
-        friends.push({  username: val, isOnline: true })
-        friendNames.push(val)
+        friends.push({  username: val, isOnline: true });
+        friendNames.push(val);
       }
-    })
+    });
   }
 
-   // adds all friend requests sent to list
-   if (currentFriendsReceived !== undefined && currentFriendsReceived !== null) {
+  // adds all friend requests sent to list
+  if (currentFriendsReceived !== undefined && currentFriendsReceived !== null) {
     Object.keys(currentFriendsReceived).forEach((key) => {
       const val = currentFriendsReceived[key];
       if (friendRequestsRecievedNames.indexOf(val) === -1) {
-        friendRequestsRecieved.push({  username: val, isOnline: true })
-        friendRequestsRecievedNames.push(val)
+        friendRequestsRecieved.push({  username: val, isOnline: true });
+        friendRequestsRecievedNames.push(val);
       }
-    })
+    });
   }
 
-   // adds all friend requests received to list
-   
-   if (currentFriendsSent !== undefined && currentFriendsSent !== null) {
+  // adds all friend requests received to list
+  if (currentFriendsSent !== undefined && currentFriendsSent !== null) {
     Object.keys(currentFriendsSent).forEach((key) => {
       const val = currentFriendsSent[key];
       if (friendRequestsSentNames.indexOf(val) === -1) {
-        friendRequestsSent.push({  username: val, isOnline: true })
-        friendRequestsSentNames.push(val)
+        friendRequestsSent.push({  username: val, isOnline: true });
+        friendRequestsSentNames.push(val);
       }
-    })
+    });
   }
 }
 
 
 // firebase arrays are structured similarly to dicts, must isolate values from keys to properly interact
 function getValuesFromFirebaseArray(dict: any): any[] {
-  const vals: any[] = []
+  const vals: any[] = [];
   Object.keys(dict).forEach((key) => {
     const val = dict[key];
     vals.push(val);
   })
-  return vals
+  return vals;
 }
 
 
 // looks up the user the current user is friend requesting, sends a request to them when found
 async function setFriendRequestReceived(givenUsername: string, curUsername: string) {
   await firebase.database().ref('users').get().then((snapshot) => { 
-    console.log(snapshot.val())
+    console.log(snapshot.val());
     if (snapshot.exists()) {
       Object.keys(snapshot.val()).forEach((key) => {
         const val = snapshot.val()[key];
@@ -169,16 +159,14 @@ async function setFriendRequestReceived(givenUsername: string, curUsername: stri
 
 // handles all logging out; resets data and de-auths firebase
 function logout() {
-
-  firebase.auth().signOut()
-
-  username = ''
+  username = '';
   friends = [];
   friendNames = [];
   friendRequestsSent= [];
   friendRequestsSentNames = [];
   friendRequestsRecieved = [];
   friendRequestsRecievedNames= [];
+  firebase.auth().signOut();
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -203,31 +191,32 @@ export default function UserProfile(): JSX.Element {
   const [offlineFriends, setOfflineFriends] = useState<FriendList>([]);
   const [friendName, setFriendName] = useState<string>('');
 
-  readUserData()
-
   const updateDisplayName = async (name: string) => {
     setDisplayName(name);
+    displayname = name;
     
-    const user = firebase.auth().currentUser
+    if (!guest) {
+      const user = firebase.auth().currentUser
 
-    await firebase.database().ref('users').child(user!.uid).update({
-      displayname: name
-    })
+      await firebase.database().ref('users').child(user!.uid).update({
+        displayname: name
+      });
+    }
   };
 
   const addFriend = async () => {
-    const user = firebase.auth().currentUser
+    const user = firebase.auth().currentUser;
 
-    let currentFriendResquestsSent: string[] = []
-    let currentFriendsList: string[] = []
-    let currentUsername = ''
+    let currentFriendResquestsSent: string[] = [];
+    let currentFriendsList: string[] = [];
+    let currentUsername = '';
 
     // creates a list of all usernames stored in database
     // used to verify that friend request is targetting an existing user
-    let allUsernames: any[] = []
+    let allUsernames: any[] = [];
     await firebase.database().ref('allUsernames').get().then((snapshot) => {
       if (snapshot.exists()) {
-        allUsernames = getValuesFromFirebaseArray(snapshot.val())
+        allUsernames = getValuesFromFirebaseArray(snapshot.val());
         console.log(allUsernames);
       }
       else {
@@ -244,13 +233,13 @@ export default function UserProfile(): JSX.Element {
       await firebase.database().ref('users').child(user!.uid).get().then((snapshot) => { 
         if (snapshot.exists()) {
           if (snapshot.val().friendsRequestsSent !== null && snapshot.val().friendsRequestsSent !== undefined) {
-            currentFriendResquestsSent = snapshot.val().friendsRequestsSent
+            currentFriendResquestsSent = snapshot.val().friendsRequestsSent;
           }
           if (snapshot.val().friendsList !== null && snapshot.val().friendsList !== undefined) {
-            currentFriendsList = snapshot.val().friendsList
+            currentFriendsList = snapshot.val().friendsList;
           }
           if (snapshot.val().username !== null && snapshot.val().username !== undefined) {
-            currentUsername = snapshot.val().username
+            currentUsername = snapshot.val().username;
           }
         }
         else {
@@ -267,7 +256,7 @@ export default function UserProfile(): JSX.Element {
       if (getValuesFromFirebaseArray(currentFriendsList).indexOf(friendName) === -1 && currentFriendResquestsSent.indexOf(friendName) === -1 &&
           allUsernames.indexOf(friendName) !== -1 && currentUsername !== friendName) {
         firebase.database().ref('users').child(user!.uid).child("friendsRequestsSent").push(friendName);
-        await setFriendRequestReceived(friendName, currentUsername)
+        await setFriendRequestReceived(friendName, currentUsername);
       }
     }
   }
@@ -276,12 +265,12 @@ export default function UserProfile(): JSX.Element {
     // check to make sure they ARE already friend
     // remove friend from friend list
     // update other user's friend list to remove user from their friend list
-  }
+  };
 
   const denyFriendRequest = (friend: Friend) => {
     // remove request from friendRequestRecieved list
     // remove request from other user's friendRequestSent list
-  }
+  };
 
   const acceptFriendRequest = (friend: Friend) => {
     // remove request from friendRequestRecieved list
@@ -289,32 +278,34 @@ export default function UserProfile(): JSX.Element {
 
     // add friendName to friend list
     // add user.username to their friend list
-  }
+  };
 
   const updateFriendListing = useCallback(() => {
-    // get updated friend list and sort by username alphabetically
-    friends = friends.sort((a, b) => {
-      const usernameA = a.username.toUpperCase();
-      const usernameB = b.username.toUpperCase();
-      if (usernameA < usernameB) {
-        return -1;
-      }
-      if (usernameA > usernameB) {
-        return 1;
-      }
-      return 0;
+    // read user data then get updated friend list and sort by username alphabetically
+    readUserData().then(() => {
+      friends = friends.sort((a, b) => {
+        const usernameA = a.username.toUpperCase();
+        const usernameB = b.username.toUpperCase();
+        if (usernameA < usernameB) {
+          return -1;
+        }
+        if (usernameA > usernameB) {
+          return 1;
+        }
+        return 0;
+      });
+  
+      // filter online and offline friends
+      setOnlineFriends(friends.filter((friend) => friend.isOnline === true));
+      setOfflineFriends(friends.filter((friend) => friend.isOnline === false));
     });
+    
+  }, [setOnlineFriends, setOfflineFriends, readUserData]);
 
-    // filter online and offline friends
-    setOnlineFriends(friends.filter((friend) => friend.isOnline === true));
-    setOfflineFriends(friends.filter((friend) => friend.isOnline === false));
-
-
-  }, [setOnlineFriends, setOfflineFriends]);
-
+  // update friend list every 10 seconds
   useEffect(() => {
     updateFriendListing();
-    const timer = setInterval(updateFriendListing, 2000);
+    const timer = setInterval(updateFriendListing, 10000);
     return () => {
       clearInterval(timer)
     };
@@ -388,7 +379,7 @@ export default function UserProfile(): JSX.Element {
         <Button size="sm" data-testid="removeFriend" onClick={removeFriend}>Remove Friend</Button>
       </Box>
     </>);
-  }
+  };
 
   return(
     <>
