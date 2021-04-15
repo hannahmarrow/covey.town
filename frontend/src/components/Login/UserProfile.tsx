@@ -13,9 +13,7 @@ import {
   Td,
   Th,
   Thead,
-  Theme,
   Tr,
-  useToast
 } from '@chakra-ui/react';
 import firebase from "firebase/app";
 import "firebase/auth";
@@ -50,8 +48,8 @@ let friendNames: string[] = [];
 
 
 // firebase arrays are structured similarly to dicts, must isolate values from keys to properly interact
-function getValuesFromFirebaseArray(dict: any): any[] {
-  const vals: any[] = []
+function getValuesFromFirebaseArray(dict: any): string[] {
+  const vals: string[] = []
     if (dict !== undefined && dict !== null) {
     Object.keys(dict).forEach((key) => {
       const val = dict[key];
@@ -90,7 +88,6 @@ function getUserKeyByUsername(dict: any, curUsername: string): any {
 // looks up the user the current user is friend requesting, sends a request to them when found
 async function setFriendRequestReceived(givenUsername: string, curUsername: string) {
   await firebase.database().ref('users').get().then((snapshot) => {
-    console.log(snapshot.val())
     if (snapshot.exists()) {
       Object.keys(snapshot.val()).forEach((key) => {
         const val = snapshot.val()[key];
@@ -99,17 +96,12 @@ async function setFriendRequestReceived(givenUsername: string, curUsername: stri
         }
       })
     }
-    else {
-      console.log("No data available");
-    }
-  }).catch((error) => {
-    console.error(error);
-  });
+  })
 }
 
 
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles(() => ({
   rightJustify: {
     float: "right",
   }
@@ -132,7 +124,7 @@ export default function UserProfile(): JSX.Element {
   const [friendName, setFriendName] = useState<string>('');
   const [friendRequestsSent, setFriendRequestsSent] = useState<FriendList>([]);
   const [friendRequestsRecieved, setFriendRequestsRecieved] = useState<FriendList>([]);
-  const [friends, setFriends] = useState<FriendList>([]);
+  const [friends] = useState<FriendList>([]);
 
 
   let displayname = '';
@@ -149,11 +141,10 @@ export default function UserProfile(): JSX.Element {
     let currentFriendsSent: any = []
     let currentFriendsReceived: any = []
 
-    if (user !== null && user !== undefined) {
+    if (user) {
 
-      await firebase.database().ref('users').child(user!.uid).get().then((snapshot) => {
+      await firebase.database().ref('users').child(user.uid).get().then((snapshot) => {
         if (snapshot.exists()) {
-          console.log(snapshot.val());
           username = snapshot.val().username
           displayname = snapshot.val().displayname
           currentFriends = snapshot.val().friendsList
@@ -161,16 +152,13 @@ export default function UserProfile(): JSX.Element {
           currentFriendsReceived = snapshot.val().friendsRequestsReceived
         }
         else {
-          console.log("No data available");
           username = 'GUEST'
           displayname = 'GUEST'
           currentFriends = []
           currentFriendsSent = []
           currentFriendsReceived = []
         }
-      }).catch((error) => {
-        console.error(error);
-      });
+      })
     }
     else {
       username = 'GUEST'
@@ -242,9 +230,11 @@ export default function UserProfile(): JSX.Element {
     if (!guest) {
       const user = firebase.auth().currentUser
 
-      await firebase.database().ref('users').child(user!.uid).update({
-        displayname: name
-      });
+      if (user) {
+        await firebase.database().ref('users').child(user.uid).update({
+          displayname: name
+        });
+      }
     }
   };
 
@@ -261,20 +251,14 @@ export default function UserProfile(): JSX.Element {
     await firebase.database().ref('allUsernames').get().then((snapshot) => {
       if (snapshot.exists()) {
         allUsernames = getValuesFromFirebaseArray(snapshot.val());
-        console.log(allUsernames);
       }
-      else {
-        console.log("No data available");
-      }
-    }).catch((error) => {
-      console.error(error);
-    });
+    })
 
 
     // if the current user exists, we pull their current friendsList as well as current friendRequestsList from the database
-    if (user !== null && user !== undefined) {
+    if (user) {
 
-      await firebase.database().ref('users').child(user!.uid).get().then((snapshot) => {
+      await firebase.database().ref('users').child(user.uid).get().then((snapshot) => {
         if (snapshot.exists()) {
           if (snapshot.val().friendsRequestsSent !== null && snapshot.val().friendsRequestsSent !== undefined) {
             currentFriendResquestsSent = snapshot.val().friendsRequestsSent;
@@ -286,20 +270,15 @@ export default function UserProfile(): JSX.Element {
             currentUsername = snapshot.val().username;
           }
         }
-        else {
-          console.log("No data available");
-        }
-      }).catch((error) => {
-        console.error(error);
-      });
+      })
     }
 
     // if the friend being targetted by the request is not currently friends with the user, they haven't already been sent
     // a request, they exist, and it isn't the current users username; the request goes through
-    if (currentFriendsList !== undefined && currentFriendsList !== null) {
+    if (currentFriendsList && user) {
       if (getValuesFromFirebaseArray(currentFriendsList).indexOf(friendName) === -1 && getValuesFromFirebaseArray(currentFriendResquestsSent).indexOf(friendName) === -1 &&
           allUsernames.indexOf(friendName) !== -1 && currentUsername !== friendName) {
-        firebase.database().ref('users').child(user!.uid).child("friendsRequestsSent").push(friendName);
+        firebase.database().ref('users').child(user.uid).child("friendsRequestsSent").push(friendName);
         await setFriendRequestReceived(friendName, currentUsername);
       }
     }
@@ -315,45 +294,21 @@ export default function UserProfile(): JSX.Element {
     const user = firebase.auth().currentUser
 
     let currentFriendsList: string[] = []
-    let currentUsername = ''
-
-    // creates a list of all usernames stored in database
-    // used to verify that friend request is targetting an existing user
-    let allUsernames: any[] = []
-    await firebase.database().ref('allUsernames').get().then((snapshot) => {
-      if (snapshot.exists()) {
-        allUsernames = getValuesFromFirebaseArray(snapshot.val())
-        console.log(allUsernames);
-      }
-      else {
-        console.log("No data available");
-      }
-    }).catch((error) => {
-      console.error(error);
-    });
 
     // if the current user exists, we pull their current friendsList
-    if (user !== null && user !== undefined) {
+    if (user) {
 
-      await firebase.database().ref('users').child(user!.uid).get().then((snapshot) => {
+      await firebase.database().ref('users').child(user.uid).get().then((snapshot) => {
         if (snapshot.exists()) {
           if (snapshot.val().friendsList !== null && snapshot.val().friendsList !== undefined) {
             currentFriendsList = snapshot.val().friendsList
           }
-          if (snapshot.val().username !== null && snapshot.val().username !== undefined) {
-            currentUsername = snapshot.val().username
-          }
         }
-        else {
-          console.log("No data available");
-        }
-      }).catch((error) => {
-        console.error(error);
-      });
+      })
     }
 
     // removes friend from users friend list
-    if (currentFriendsList !== undefined && currentFriendsList !== null) {
+    if (currentFriendsList && user) {
       if (getValuesFromFirebaseArray(currentFriendsList).indexOf(friendName) !== -1) {
         const newCurrentFriends: any[] = []
         getValuesFromFirebaseArray(currentFriendsList).forEach(element => {
@@ -361,9 +316,9 @@ export default function UserProfile(): JSX.Element {
             newCurrentFriends.push(element)
           }
         });
-        await firebase.database().ref('users').child(user!.uid).child("friendsList").remove()
+        await firebase.database().ref('users').child(user.uid).child("friendsList").remove()
         newCurrentFriends.forEach(element => {
-          firebase.database().ref('users').child(user!.uid).child("friendsList").push(element);
+          firebase.database().ref('users').child(user.uid).child("friendsList").push(element);
         });
 
 
@@ -426,23 +381,25 @@ export default function UserProfile(): JSX.Element {
     let currentFriendsReceived: any[] = []
 
     const user = firebase.auth().currentUser
-    await firebase.database().ref('users').child(user!.uid).get().then((snapshot) => {
-      if (snapshot.exists()) {
-        currentFriendsReceived = getValuesFromFirebaseArray(snapshot.val().friendsRequestsReceived)
-      }
-    })
-    const newCurrentFriendsReceived: any[] = []
-    currentFriendsReceived.forEach(element => {
-      if (element !== friend.username) {
-        newCurrentFriendsReceived.push(element)
-      }
-    });
-    await firebase.database().ref('users').child(user!.uid).child("friendsRequestsReceived").remove()
-    newCurrentFriendsReceived.forEach(element => {
-      firebase.database().ref('users').child(user!.uid).child("friendsRequestsReceived").push(element);
-    });
+    if (user) {
+      await firebase.database().ref('users').child(user.uid).get().then((snapshot) => {
+        if (snapshot.exists()) {
+          currentFriendsReceived = getValuesFromFirebaseArray(snapshot.val().friendsRequestsReceived)
+        }
+      })
+      const newCurrentFriendsReceived: any[] = []
+      currentFriendsReceived.forEach(element => {
+        if (element !== friend.username) {
+          newCurrentFriendsReceived.push(element)
+        }
+      });
+      await firebase.database().ref('users').child(user.uid).child("friendsRequestsReceived").remove()
+      newCurrentFriendsReceived.forEach(element => {
+        firebase.database().ref('users').child(user.uid).child("friendsRequestsReceived").push(element);
+      });
 
-    setFriendRequestsRecieved(friendRequestsRecieved);
+      setFriendRequestsRecieved(friendRequestsRecieved);
+    }
   }
 
   const acceptFriendRequest = async (friend: Friend) => {
@@ -451,9 +408,6 @@ export default function UserProfile(): JSX.Element {
 
     // add friendName to friend list
     // add user.username to their friend list
-
-    console.log("accepted")
-    console.log(friend.username)
 
     // removes friend sent from friend database, adds user to friends list
     let friendSent: any[] = []
@@ -482,25 +436,27 @@ export default function UserProfile(): JSX.Element {
     let currentFriendsReceived: any[] = []
 
     const user = firebase.auth().currentUser
-    await firebase.database().ref('users').child(user!.uid).get().then((snapshot) => {
-      if (snapshot.exists()) {
-        currentFriendsReceived = getValuesFromFirebaseArray(snapshot.val().friendsRequestsReceived)
-      }
-    })
-    const newCurrentFriendsReceived: any[] = []
-    currentFriendsReceived.forEach(element => {
-      if (element !== friend.username) {
-        newCurrentFriendsReceived.push(element)
-      }
-    });
-    await firebase.database().ref('users').child(user!.uid).child("friendsRequestsReceived").remove()
-    newCurrentFriendsReceived.forEach(element => {
-      firebase.database().ref('users').child(user!.uid).child("friendsRequestsReceived").push(element);
-    });
-    firebase.database().ref('users').child(user!.uid).child("friendsList").push(friend.username);
+    if (user) {
+      await firebase.database().ref('users').child(user.uid).get().then((snapshot) => {
+        if (snapshot.exists()) {
+          currentFriendsReceived = getValuesFromFirebaseArray(snapshot.val().friendsRequestsReceived)
+        }
+      })
+      const newCurrentFriendsReceived: any[] = []
+      currentFriendsReceived.forEach(element => {
+        if (element !== friend.username) {
+          newCurrentFriendsReceived.push(element)
+        }
+      });
+    
+      await firebase.database().ref('users').child(user.uid).child("friendsRequestsReceived").remove()
+      newCurrentFriendsReceived.forEach(element => {
+        firebase.database().ref('users').child(user.uid).child("friendsRequestsReceived").push(element);
+      });
+      firebase.database().ref('users').child(user.uid).child("friendsList").push(friend.username);
 
-    setFriendRequestsRecieved(friendRequestsRecieved);
-
+      setFriendRequestsRecieved(friendRequestsRecieved);
+    }
   }
 
   const initializeData = useCallback(() => {
@@ -532,7 +488,7 @@ export default function UserProfile(): JSX.Element {
   useEffect(() => {
     initializeData();
     updateFriendListing();
-    const timer = setInterval(updateFriendListing, 10000);
+    const timer = setInterval(updateFriendListing, 2000);
     return () => {
       clearInterval(timer)
     };
