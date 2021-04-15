@@ -94,7 +94,7 @@ const CreateAccount: React.FunctionComponent = () => {
 
       // confirm username is unique
       let allUsernames: any = [];
-      await firebase.database().ref('/').get().then((snapshot) => { 
+      await firebase.database().ref('/').get().then((snapshot) => {
         if (snapshot.exists()) {
           allUsernames = snapshot.val().allUsernames;
         }
