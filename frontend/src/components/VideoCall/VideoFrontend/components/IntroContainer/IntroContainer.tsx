@@ -1,7 +1,7 @@
 import React from 'react';
-import { makeStyles, Theme } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles(() => ({
   background: {
     display: 'flex',
     alignItems: 'center',
@@ -41,7 +41,7 @@ interface IntroContainerProps {
   subContent?: React.ReactNode;
 }
 
-const IntroContainer = ({children, subContent}: IntroContainerProps) => {
+const IntroContainer = ({children, subContent}: IntroContainerProps): JSX.Element => {
   const classes = useStyles();
 
   return (

@@ -86,10 +86,10 @@ const EditAccount: React.FunctionComponent = () => {
     async function setNewPasswordToDatabase() {
       const user = firebase.auth().currentUser;
 
-      if (user !== null && user !== undefined && validation()) {
+      if (user && user.email && validation()) {
 
         const credential = firebase.auth.EmailAuthProvider.credential(
-          user.email!,
+          user.email,
           currentPass
         );
         
