@@ -130,7 +130,7 @@ export default function UserProfile(): JSX.Element {
   let displayname = '';
 
   // reads all the users data, sets
-  async function readUserData() {
+  const readUserData = useCallback(async () => {
     const user = firebase.auth().currentUser;
 
     let currentFriends: any = [];
@@ -177,7 +177,6 @@ export default function UserProfile(): JSX.Element {
       });
     }
 
-
     // adds all friend requests sent to list
     while(friendRequestsRecieved.length > 0) {
       friendRequestsRecieved.pop();
@@ -207,7 +206,9 @@ export default function UserProfile(): JSX.Element {
         }
       });
     }
-  }
+
+  }, []); 
+
   // handles all logging out; resets data and de-auths firebase
   function logout() {
 
@@ -215,8 +216,6 @@ export default function UserProfile(): JSX.Element {
 
     username = '';
   }
-
-  readUserData();
 
   const updateDisplayName = async (name: string) => {
     setDisplayName(name);
@@ -239,7 +238,7 @@ export default function UserProfile(): JSX.Element {
         setDisplayName(displayname);
       }
     });
-  }, [readUserData, setDisplayName, guest, displayname]);
+  }, [displayname, guest, readUserData, setDisplayName]);
 
   const updateFriendListing = useCallback(() => {
     // filter online and offline friends
