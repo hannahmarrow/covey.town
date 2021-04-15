@@ -42,7 +42,7 @@ interface UserProfileContainerProps {
   subContent?: React.ReactNode;
 }
 
-const UserProfileContainer = ({children, subContent}: UserProfileContainerProps) => {
+const UserProfileContainer = ({children, subContent}: UserProfileContainerProps): JSX.Element => {
   const classes = useStyles();
 
   return (
