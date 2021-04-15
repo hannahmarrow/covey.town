@@ -45,6 +45,7 @@ else {
 let username = '';
 let friendRequestsSentNames: string[] = [];
 let friendRequestsRecievedNames: string[] = [];
+let friendNames: string[] = [];
 
 
 
@@ -131,105 +132,106 @@ export default function UserProfile(): JSX.Element {
   const [friendName, setFriendName] = useState<string>('');
   const [friendRequestsSent, setFriendRequestsSent] = useState<FriendList>([]);
   const [friendRequestsRecieved, setFriendRequestsRecieved] = useState<FriendList>([]);
+  const [friends, setFriends] = useState<FriendList>([]);
 
 
-let displayname = '';
-let friends: FriendList = [];
-const friendNames: string[] = [];
+  let displayname = '';
 
 
 
-// reads all the users data, sets
-async function readUserData() {
-  const user = firebase.auth().currentUser;
 
-  let currentFriends: any = [];
-  let currentFriendsSent: any = [];
-  let currentFriendsReceived: any = [];
+  // reads all the users data, sets
+  async function readUserData() {
 
-  if (user !== null && user !== undefined) {
+    const user = await firebase.auth().currentUser
 
-    await firebase.database().ref('users').child(user!.uid).get().then((snapshot) => {
-      if (snapshot.exists()) {
-        console.log(snapshot.val());
-        username = snapshot.val().username;
-        displayname = snapshot.val().displayname;
-        currentFriends = snapshot.val().friendsList;
-        currentFriendsSent = snapshot.val().friendsRequestsSent;
-        currentFriendsReceived = snapshot.val().friendsRequestsReceived;
-      }
-      else {
-        username = 'GUEST';
-        displayname = 'GUEST';
-        currentFriends = [];
-        currentFriendsSent = [];
-        currentFriendsReceived = [];
-      }
-    }).catch((error) => {
-      console.error(error);
-    });
-  }
-  else {
-    username = 'GUEST';
-    displayname = 'GUEST';
-    currentFriends = [];
-    currentFriendsSent = [];
-    currentFriendsReceived = [];
-  }
+    let currentFriends: any = []
+    let currentFriendsSent: any = []
+    let currentFriendsReceived: any = []
 
-  // adds all friends to friendsList
-  console.log(currentFriends)
-  console.log(friendNames)
-  if (currentFriends !== undefined && currentFriends !== null) {
-    Object.keys(currentFriends).forEach((key) => {
-      const val = currentFriends[key];
-      if (friendNames.indexOf(val) === -1) {
-        friends.push({  username: val, isOnline: true });
-        friendNames.push(val);
-      }
-    });
-  }
+    if (user !== null && user !== undefined) {
 
-
-   // adds all friend requests sent to list
-  while(friendRequestsRecieved.length > 0) {
-    friendRequestsRecieved.pop();
-  }
-   if (currentFriendsReceived !== undefined && currentFriendsReceived !== null) {
-
-    Object.keys(currentFriendsReceived).forEach((key) => {
-      const val = currentFriendsReceived[key];
-      friendRequestsRecievedNames = getValuesFromFirebaseArray(currentFriendsReceived)
-
-      if (friendRequestsRecievedNames.indexOf(val) !== -1) {
-        friendRequestsRecieved.push({  username: val, isOnline: true })
-      }
-    })
-    console.log(friendRequestsRecievedNames)
-    console.log(friendRequestsRecieved)
-  }
-
-   // adds all friend requests received to list
-   if (currentFriendsSent !== undefined && currentFriendsSent !== null) {
-    while(friendRequestsSent.length > 0) {
-      friendRequestsSent.pop();
+      await firebase.database().ref('users').child(user!.uid).get().then((snapshot) => {
+        if (snapshot.exists()) {
+          console.log(snapshot.val());
+          username = snapshot.val().username
+          displayname = snapshot.val().displayname
+          currentFriends = snapshot.val().friendsList
+          currentFriendsSent = snapshot.val().friendsRequestsSent
+          currentFriendsReceived = snapshot.val().friendsRequestsReceived
+        }
+        else {
+          console.log("No data available");
+          username = 'GUEST'
+          displayname = 'GUEST'
+          currentFriends = []
+          currentFriendsSent = []
+          currentFriendsReceived = []
+        }
+      }).catch((error) => {
+        console.error(error);
+      });
     }
-    Object.keys(currentFriendsSent).forEach((key) => {
-      const val = currentFriendsSent[key];
-      friendRequestsSentNames = getValuesFromFirebaseArray(currentFriendsSent)
-      if (friendRequestsSentNames.indexOf(val) !== -1) {
-        friendRequestsSent.push({  username: val, isOnline: true })
+    else {
+      username = 'GUEST'
+      displayname = 'GUEST'
+      currentFriends = []
+      currentFriendsSent = []
+      currentFriendsReceived = []
+    }
+
+    // adds all friends to friendsList
+    while(friends.length > 0) {
+      friends.pop();
+    }
+    if (currentFriends !== undefined && currentFriends !== null) {
+      Object.keys(currentFriends).forEach((key) => {
+        const val = currentFriends[key];
+        friendNames = getValuesFromFirebaseArray(currentFriends)
+        if (friendNames.indexOf(val) !== -1) {
+          friends.push({  username: val, isOnline: true })
+        }
+      })
+    }
+
+
+    // adds all friend requests sent to list
+    while(friendRequestsRecieved.length > 0) {
+      friendRequestsRecieved.pop();
+    }
+    if (currentFriendsReceived !== undefined && currentFriendsReceived !== null) {
+
+      Object.keys(currentFriendsReceived).forEach((key) => {
+        const val = currentFriendsReceived[key];
+        friendRequestsRecievedNames = getValuesFromFirebaseArray(currentFriendsReceived)
+
+        if (friendRequestsRecievedNames.indexOf(val) !== -1) {
+          friendRequestsRecieved.push({  username: val, isOnline: true })
+        }
+      })
+    }
+
+    // adds all friend requests received to list
+    if (currentFriendsSent !== undefined && currentFriendsSent !== null) {
+      while(friendRequestsSent.length > 0) {
+        friendRequestsSent.pop();
       }
-    });
+      Object.keys(currentFriendsSent).forEach((key) => {
+        const val = currentFriendsSent[key];
+        friendRequestsSentNames = getValuesFromFirebaseArray(currentFriendsSent)
+        if (friendRequestsSentNames.indexOf(val) !== -1) {
+          friendRequestsSent.push({  username: val, isOnline: true })
+        }
+      })
+    }
   }
-}
-// handles all logging out; resets data and de-auths firebase
-function logout() {
+  // handles all logging out; resets data and de-auths firebase
+  function logout() {
 
-  firebase.auth().signOut()
+    firebase.auth().signOut()
 
-  username = ''
-}
+    username = ''
+  }
 
   readUserData()
 
@@ -520,6 +522,7 @@ function logout() {
 
     // get updated friendRequestsRecieved list (no sort)
     setFriendRequestsRecieved(friendRequestsRecieved);
+
 
 
   }, [setOnlineFriends, setOfflineFriends]);
