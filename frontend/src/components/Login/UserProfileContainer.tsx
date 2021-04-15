@@ -1,7 +1,7 @@
 import React from 'react';
-import { makeStyles, Theme } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles(() => ({
   background: {
     display: 'flex',
     alignItems: 'top',
@@ -42,19 +42,23 @@ interface UserProfileContainerProps {
   subContent?: React.ReactNode;
 }
 
-const UserProfileContainer = (props: UserProfileContainerProps) => {
+const UserProfileContainer = ({children, subContent}: UserProfileContainerProps) => {
   const classes = useStyles();
 
   return (
     <div className={classes.background}>
       <div className={classes.container}>
         <div className={classes.innerContainer}>
-          <div className={classes.content}>{props.children}</div>
+          <div className={classes.content}>{children}</div>
         </div>
-        {props.subContent && <div className={classes.subContentContainer}>{props.subContent}</div>}
+        {subContent && <div className={classes.subContentContainer}>{subContent}</div>}
       </div>
     </div>
   );
 };
+
+UserProfileContainer.defaultProps = {
+  subContent: <></>,
+}
 
 export default UserProfileContainer;
