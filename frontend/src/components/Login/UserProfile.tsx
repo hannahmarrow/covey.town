@@ -125,12 +125,7 @@ export default function UserProfile(): JSX.Element {
   const [friendRequestsSent, setFriendRequestsSent] = useState<FriendList>([]);
   const [friendRequestsRecieved, setFriendRequestsRecieved] = useState<FriendList>([]);
   const [friends] = useState<FriendList>([]);
-
-
   let displayname = '';
-
-
-
 
   // reads all the users data, sets
   async function readUserData() {
@@ -142,7 +137,6 @@ export default function UserProfile(): JSX.Element {
     let currentFriendsReceived: any = [];
 
     if (user) {
-
       await firebase.database().ref('users').child(user.uid).get().then((snapshot) => {
         if (snapshot.exists()) {
           username = snapshot.val().username;
@@ -472,17 +466,13 @@ export default function UserProfile(): JSX.Element {
     setOnlineFriends(friends.filter((friend) => friend.isOnline === true));
     setOfflineFriends(friends.filter((friend) => friend.isOnline === false));
 
-
-
     // get updated friendRequestsSent list (no sort)
     setFriendRequestsSent(friendRequestsSent);
 
     // get updated friendRequestsRecieved list (no sort)
     setFriendRequestsRecieved(friendRequestsRecieved);
 
-
-
-  }, [setOnlineFriends, setOfflineFriends]);
+  }, [setOnlineFriends, setOfflineFriends, setFriendRequestsRecieved, setFriendRequestsSent]);
 
   // update friend list every 10 seconds
   useEffect(() => {

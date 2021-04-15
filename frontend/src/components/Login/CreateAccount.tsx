@@ -96,7 +96,6 @@ const CreateAccount: React.FunctionComponent = () => {
       let allUsernames: any = [];
       await firebase.database().ref('/').get().then((snapshot) => {
         if (snapshot.exists()) {
-          console.log(snapshot.val());
           allUsernames = snapshot.val().allUsernames;
         }
       });
@@ -187,7 +186,6 @@ const CreateAccount: React.FunctionComponent = () => {
             let allUsernames = [];
             firebase.database().ref('/').get().then((snapshot) => {
               if (snapshot.exists()) {
-                console.log(snapshot.val());
                 allUsernames = snapshot.val().allUsernames;
               }
             });

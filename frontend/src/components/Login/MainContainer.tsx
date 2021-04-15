@@ -40,19 +40,23 @@ interface MainContainerProps {
   subContent?: React.ReactNode;
 }
 
-const MainContainer = (props: MainContainerProps) => {
+const MainContainer = ({children, subContent}: MainContainerProps) => {
   const classes = useStyles();
 
   return (
     <div className={classes.background}>
       <div className={classes.container}>
         <div className={classes.innerContainer}>
-          <div className={classes.content}>{props.children}</div>
+          <div className={classes.content}>{children}</div>
         </div>
-        {props.subContent && <div className={classes.subContentContainer}>{props.subContent}</div>}
+        {subContent && <div className={classes.subContentContainer}>{subContent}</div>}
       </div>
     </div>
   );
 };
+
+MainContainer.defaultProps = {
+  subContent: <></>,
+}
 
 export default MainContainer;
