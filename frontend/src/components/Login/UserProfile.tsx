@@ -511,6 +511,7 @@ export default function UserProfile(): JSX.Element {
     });
   }, [readUserData, setDisplayName]);
 
+  const updateFriendListing = useCallback(() => {
     // filter online and offline friends
     setOnlineFriends(friends.filter((friend) => friend.isOnline === true));
     setOfflineFriends(friends.filter((friend) => friend.isOnline === false));
