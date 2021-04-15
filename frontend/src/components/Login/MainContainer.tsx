@@ -4,7 +4,6 @@ import { makeStyles, Theme } from '@material-ui/core';
 const useStyles = makeStyles((theme: Theme) => ({
   background: {
     display: 'flex',
-    alignItems: 'center',
     justifyContent: 'center',
     height: '100%',
   },
@@ -36,12 +35,12 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-interface IntroContainerProps {
+interface MainContainerProps {
   children: React.ReactNode;
   subContent?: React.ReactNode;
 }
 
-const IntroContainer = (props: IntroContainerProps) => {
+const MainContainer = (props: MainContainerProps) => {
   const classes = useStyles();
 
   return (
@@ -56,4 +55,4 @@ const IntroContainer = (props: IntroContainerProps) => {
   );
 };
 
-export default IntroContainer;
+export default MainContainer;

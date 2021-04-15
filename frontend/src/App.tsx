@@ -7,6 +7,11 @@ import { io, Socket } from 'socket.io-client';
 import { ChakraProvider } from '@chakra-ui/react';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 import assert from 'assert';
+import firebase from "firebase/app";
+import "firebase/auth";
+import { FirebaseAuthProvider, IfFirebaseAuthed, IfFirebaseUnAuthed } from '@react-firebase/auth';
+import { FirebaseDatabaseProvider } from '@react-firebase/database';
+import LoginScreen from './components/Login/LoginScreen';
 import WorldMap from './components/world/WorldMap';
 import VideoOverlay from './components/VideoCall/VideoOverlay/VideoOverlay';
 import { CoveyAppState, NearbyPlayers } from './CoveyTypes';
@@ -26,6 +31,7 @@ import Player, { ServerPlayer, UserLocation } from './classes/Player';
 import TownsServiceClient, { TownJoinResponse } from './classes/TownsServiceClient';
 import Video from './classes/Video/Video';
 
+
 type CoveyAppUpdate =
   | { action: 'doConnect'; data: { userName: string, townFriendlyName: string, townID: string,townIsPubliclyListed:boolean, sessionToken: string, myPlayerID: string, socket: Socket, players: Player[], emitMovement: (location: UserLocation) => void } }
   | { action: 'addPlayer'; player: Player }
@@ -34,6 +40,16 @@ type CoveyAppUpdate =
   | { action: 'weMoved'; location: UserLocation }
   | { action: 'disconnect' }
   ;
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBl1Hz-MzSapBEoLmZgr3ycwVVmjD3wrPw",
+    authDomain: "cs4530.firebaseapp.com",
+    databaseURL: "https://cs4530-default-rtdb.firebaseio.com",
+    projectId: "cs4530",
+    storageBucket: "cs4530.appspot.com",
+    messagingSenderId: "898846758501",
+    appId: "1:898846758501:web:0a4d63ebaaa0d51778988c"
+    };
 
 function defaultAppState(): CoveyAppState {
   return {
@@ -230,14 +246,25 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
     );
   }, [setupGameController, appState.sessionToken, videoInstance]);
   return (
-
-    <CoveyAppContext.Provider value={appState}>
-      <VideoContext.Provider value={Video.instance()}>
-        <NearbyPlayersContext.Provider value={appState.nearbyPlayers}>
-          {page}
-        </NearbyPlayersContext.Provider>
-      </VideoContext.Provider>
-    </CoveyAppContext.Provider>
+    /* eslint-disable react/jsx-props-no-spreading */
+    <FirebaseAuthProvider {...firebaseConfig} firebase={firebase}>
+      <IfFirebaseUnAuthed>
+        {() => <LoginScreen/>}
+      </IfFirebaseUnAuthed>
+      <IfFirebaseAuthed>
+        {() => 
+          <FirebaseDatabaseProvider firebase={firebase}>
+            <CoveyAppContext.Provider value={appState}>
+              <VideoContext.Provider value={Video.instance()}>
+                <NearbyPlayersContext.Provider value={appState.nearbyPlayers}>
+                  {page}
+                </NearbyPlayersContext.Provider>
+              </VideoContext.Provider>
+            </CoveyAppContext.Provider>
+          </FirebaseDatabaseProvider>
+        }
+      </IfFirebaseAuthed>
+    </FirebaseAuthProvider>
 
   );
 }

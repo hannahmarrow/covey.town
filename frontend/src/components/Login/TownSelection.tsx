@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import assert from "assert";
 import {
   Box,
@@ -23,13 +23,14 @@ import useVideoContext from '../VideoCall/VideoFrontend/hooks/useVideoContext/us
 import Video from '../../classes/Video/Video';
 import { CoveyTownInfo, TownJoinResponse, } from '../../classes/TownsServiceClient';
 import useCoveyAppState from '../../hooks/useCoveyAppState';
+import DisplayNameContext from '../../contexts/DisplayNameContext';
 
 interface TownSelectionProps {
   doLogin: (initData: TownJoinResponse) => Promise<boolean>
 }
 
 export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Element {
-  const [userName, setUserName] = useState<string>(Video.instance()?.userName || '');
+  // const [userName, setUserName] = useState<string>(Video.instance()?.userName || '');
   const [newTownName, setNewTownName] = useState<string>('');
   const [newTownIsPublic, setNewTownIsPublic] = useState<boolean>(true);
   const [townIDToJoin, setTownIDToJoin] = useState<string>('');
@@ -37,9 +38,9 @@ export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Elem
   const { connect } = useVideoContext();
   const { apiClient } = useCoveyAppState();
   const toast = useToast();
+  const displayName = useContext(DisplayNameContext).displayName;
 
   const updateTownListings = useCallback(() => {
-    // console.log(apiClient);
     apiClient.listTowns()
       .then((towns) => {
         setCurrentPublicTowns(towns.towns
@@ -57,6 +58,7 @@ export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Elem
 
   const handleJoin = useCallback(async (coveyRoomID: string) => {
     try {
+      const userName = displayName;
       if (!userName || userName.length === 0) {
         toast({
           title: 'Unable to join town',
@@ -65,6 +67,7 @@ export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Elem
         });
         return;
       }
+      // if user is NOT guest, store displayName in database
       if (!coveyRoomID || coveyRoomID.length === 0) {
         toast({
           title: 'Unable to join town',
@@ -87,9 +90,11 @@ export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Elem
         status: 'error'
       })
     }
-  }, [doLogin, userName, connect, toast]);
+  }, [doLogin, connect, toast, displayName]);
 
   const handleCreate = async () => {
+    // get displayName (username) from firebase
+    const userName = displayName;
     if (!userName || userName.length === 0) {
       toast({
         title: 'Unable to create town',
@@ -140,17 +145,6 @@ export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Elem
     <>
       <form>
         <Stack>
-          <Box p="4" borderWidth="1px" borderRadius="lg">
-            <Heading as="h2" size="lg">Select a username</Heading>
-
-            <FormControl>
-              <FormLabel htmlFor="name">Name</FormLabel>
-              <Input autoFocus name="name" placeholder="Your name"
-                     value={userName}
-                     onChange={event => setUserName(event.target.value)}
-              />
-            </FormControl>
-          </Box>
           <Box borderWidth="1px" borderRadius="lg">
             <Heading p="4" as="h2" size="lg">Create a New Town</Heading>
             <Flex p="4">
