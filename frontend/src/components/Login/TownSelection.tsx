@@ -38,7 +38,7 @@ export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Elem
   const { connect } = useVideoContext();
   const { apiClient } = useCoveyAppState();
   const toast = useToast();
-  const displayName = useContext(DisplayNameContext).displayName;
+  const { displayName } = useContext(DisplayNameContext);
 
   const updateTownListings = useCallback(() => {
     apiClient.listTowns()
