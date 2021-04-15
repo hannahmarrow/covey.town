@@ -55,7 +55,7 @@ const CreateAccount: React.FunctionComponent = () => {
 
     // validates fields are not empty, passwords match, and password is valid
     // returns boolean
-    const validation = () => {
+    const validation = async () => {
       // check for empty fields
       if (username === "" || displayName === "" || email === "" || password === "" || passConfirm === "") {
         toast({
@@ -91,6 +91,34 @@ const CreateAccount: React.FunctionComponent = () => {
         });
         return false;
       }
+
+      // confirm username is unique
+      let allUsernames: any = []
+      await firebase.database().ref('/').get().then((snapshot) => { 
+        if (snapshot.exists()) {
+          console.log(snapshot.val());
+          allUsernames = snapshot.val().allUsernames;
+        } 
+      });
+
+      const allUsernamesList: any[] = []
+      Object.keys(allUsernames).forEach((key) => {
+        const val = allUsernames[key];
+        allUsernamesList.push(val);
+      });
+
+      if (allUsernamesList.indexOf(username) !== -1) {
+        toast({
+          title: 'Create Account',
+          description: 'Username already taken, please choose a different username.',
+          status: 'error',
+          position: 'top',
+          isClosable: true,
+        });
+
+        return false;
+      }
+
       // everything valid
       return true;
     };
@@ -106,7 +134,7 @@ const CreateAccount: React.FunctionComponent = () => {
     };
 
     async function addNewUser() {
-      if (validation()) {
+      if (await validation()) {
         // create new user
         await firebase.auth().createUserWithEmailAndPassword(email, password).catch((error) => {
           // Handle Errors here.
@@ -140,35 +168,35 @@ const CreateAccount: React.FunctionComponent = () => {
 
           setpassConfirm('');
           setPassword('');
-        });
+        }).then(() => {
+          const user = firebase.auth().currentUser;
 
-        const user = firebase.auth().currentUser;
-
-        if (user !== null && user !== undefined) {
+          if (user !== null && user !== undefined) {
+        
+            firebase.database().ref('users').child(user!.uid).set({
+                username, 
+                displayname: displayName,
+                email,
+                friendsList: [],
+                isOnline: true,
+                currentRoomID: "",
+                friendsRequestsSent: [],
+                friendsRequestsReceived: [],
+            });
       
-          firebase.database().ref('users').child(user!.uid).set({
-              username, 
-              displayname: displayName,
-              email,
-              friendsList: [],
-              isOnline: true,
-              currentRoomID: "",
-              friendsRequestsSent: [],
-              friendsRequestsReceived: [],
-          });
-    
-          let allUsernames = [];
-          firebase.database().ref('/').get().then((snapshot) => { 
-            if (snapshot.exists()) {
-              console.log(snapshot.val());
-              allUsernames = snapshot.val().allUsernames;
-            } 
-          });
-          allUsernames.push(username);
-          firebase.database().ref('allUsernames').push(username);
+            let allUsernames = [];
+            firebase.database().ref('/').get().then((snapshot) => { 
+              if (snapshot.exists()) {
+                console.log(snapshot.val());
+                allUsernames = snapshot.val().allUsernames;
+              } 
+            });
+            allUsernames.push(username);
+            firebase.database().ref('allUsernames').push(username);
 
-          onClose();
-        }
+            onClose();
+          }
+        });
       }
     }
 
