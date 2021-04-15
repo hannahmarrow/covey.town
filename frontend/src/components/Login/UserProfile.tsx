@@ -241,17 +241,19 @@ export default function UserProfile(): JSX.Element {
   }, [displayname, guest, readUserData, setDisplayName]);
 
   const updateFriendListing = useCallback(() => {
-    // filter online and offline friends
-    setOnlineFriends(friends.filter((friend) => friend.isOnline === true));
-    setOfflineFriends(friends.filter((friend) => friend.isOnline === false));
+    readUserData().then(() => {
+      // filter online and offline friends
+      setOnlineFriends(friends.filter((friend) => friend.isOnline === true));
+      setOfflineFriends(friends.filter((friend) => friend.isOnline === false));
 
-    // get updated friendRequestsSent list (no sort)
-    setFriendRequestsSent(friendRequestsSent);
+      // get updated friendRequestsSent list (no sort)
+      setFriendRequestsSent(friendRequestsSent);
 
-    // get updated friendRequestsRecieved list (no sort)
-    setFriendRequestsRecieved(friendRequestsRecieved);
+      // get updated friendRequestsRecieved list (no sort)
+      setFriendRequestsRecieved(friendRequestsRecieved);
+    });
 
-  }, [friendRequestsSent, friends, friendRequestsRecieved, setOnlineFriends, setOfflineFriends, setFriendRequestsRecieved, setFriendRequestsSent]);
+  }, [friendRequestsSent, friends, friendRequestsRecieved, readUserData, setOnlineFriends, setOfflineFriends, setFriendRequestsRecieved, setFriendRequestsSent]);
 
   // update friend list every 2 seconds
   useEffect(() => {
@@ -318,6 +320,7 @@ export default function UserProfile(): JSX.Element {
                     position: 'top',
                     isClosable: true,
                   });
+                  updateFriendListing();
                 }).catch((error) => {
                   toast({
                     title: 'Add Friend Error',
@@ -524,6 +527,7 @@ export default function UserProfile(): JSX.Element {
 
       setFriendRequestsRecieved(friendRequestsRecieved);
     }
+    updateFriendListing();
   }
 
   const acceptFriendRequest = async (friend: Friend) => {
@@ -581,6 +585,7 @@ export default function UserProfile(): JSX.Element {
 
       setFriendRequestsRecieved(friendRequestsRecieved);
     }
+    updateFriendListing();
   }
 
   const showLoggedInFeatures = () => {
