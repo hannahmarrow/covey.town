@@ -93,14 +93,14 @@ const CreateAccount: React.FunctionComponent = () => {
       }
 
       // confirm username is unique
-      let allUsernames: any = [];
+      let allUsernames: Record<string, string> = {};
       await firebase.database().ref('/').get().then((snapshot) => {
         if (snapshot.exists()) {
           allUsernames = snapshot.val().allUsernames;
         }
       });
 
-      const allUsernamesList: any[] = [];
+      const allUsernamesList: string[] = [];
       Object.keys(allUsernames).forEach((key) => {
         const val = allUsernames[key];
         allUsernamesList.push(val);
