@@ -49,3 +49,7 @@ The frontend will automatically re-compile and reload in your browser if you cha
 ## Public Git Repository
 
 https://github.com/hannahmarrow/covey.town
+
+## Netlify Deployment
+
+https://se-project-group-16.netlify.app/
