@@ -3,6 +3,7 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
 import "firebase/database";
+import * as FirebaseConfig from "./FirebaseConfig"
 
 import {
   Button,
@@ -24,19 +25,9 @@ import {
 } from '@chakra-ui/react';
 
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBl1Hz-MzSapBEoLmZgr3ycwVVmjD3wrPw",
-  authDomain: "cs4530.firebaseapp.com",
-  databaseURL: "https://cs4530-default-rtdb.firebaseio.com",
-  projectId: "cs4530",
-  storageBucket: "cs4530.appspot.com",
-  messagingSenderId: "898846758501",
-  appId: "1:898846758501:web:0a4d63ebaaa0d51778988c"
-};
-
 // initialize firebase
 if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
+  firebase.initializeApp(FirebaseConfig.firebaseConfig);
 }
 else {
   firebase.app();
