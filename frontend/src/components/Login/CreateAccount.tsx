@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import firebase from "firebase/app";
-import firebaseConfig from './FirebaseConfig';
+
 import "firebase/auth";
 import "firebase/firestore";
 import "firebase/database";
@@ -24,6 +24,8 @@ import {
   ListItem,
   UnorderedList,
 } from '@chakra-ui/react';
+
+import firebaseConfig from './FirebaseConfig';
 
 
 
