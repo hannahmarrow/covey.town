@@ -12,16 +12,17 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
 import "firebase/database";
-import * as FirebaseConfig from "./FirebaseConfig"
+import firebaseConfig from './FirebaseConfig';
 
 
 // adds mock data 
 describe('Firebase Tests', () => {
     it("Tests Firebase Database Get", async () => {
+        
 
       // initialize firebase
       if (!firebase.apps.length) {
-        firebase.initializeApp(FirebaseConfig.firebaseConfig);
+        firebase.initializeApp(firebaseConfig);
       }
       else {
         firebase.app();
@@ -38,7 +39,7 @@ describe('Firebase Tests', () => {
 
         // initialize firebase
         if (!firebase.apps.length) {
-          firebase.initializeApp(FirebaseConfig.firebaseConfig);
+          firebase.initializeApp(firebaseConfig);
         }
         else {
           firebase.app();

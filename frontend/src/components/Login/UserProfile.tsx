@@ -21,12 +21,12 @@ import "firebase/auth";
 import CreateAccount from './CreateAccount';
 import EditAccount from './EditAccount';
 import DisplayNameContext from '../../contexts/DisplayNameContext';
-import * as FirebaseConfig from "./FirebaseConfig"
+import firebaseConfig from './FirebaseConfig';
 
 
 // initialize firebases
 if (!firebase.apps.length) {
-  firebase.initializeApp(FirebaseConfig.firebaseConfig);
+  firebase.initializeApp(firebaseConfig);
 }
 else {
   firebase.app();
