@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+import '@testing-library/jest-dom'
 import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
