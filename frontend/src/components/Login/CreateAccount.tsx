@@ -170,9 +170,9 @@ const CreateAccount: React.FunctionComponent = () => {
         }).then(() => {
           const user = firebase.auth().currentUser;
 
-          if (user !== null && user !== undefined) {
+          if (user) {
 
-            firebase.database().ref('users').child(user!.uid).set({
+            firebase.database().ref('users').child(user.uid).set({
                 username,
                 displayname: displayName,
                 email,

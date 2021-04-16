@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Box, Heading, Text, FormControl, FormLabel, Input, Button, VStack, useToast } from '@chakra-ui/react';
 import firebase from 'firebase';
-import { makeStyles, Theme } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core';
 import CreateAccount from './CreateAccount';
 
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles(() => ({
   container: {
     margin: 'auto',
     width: '50%'
@@ -64,8 +64,6 @@ export default function LoginScreen(): JSX.Element {
             isClosable: true,
           });
         }
-         
-        console.log(error);
       });
     };
 
