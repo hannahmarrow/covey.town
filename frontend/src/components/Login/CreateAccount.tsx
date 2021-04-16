@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import firebase from "firebase/app";
+import * as FirebaseConfig from "./FirebaseConfig"
 import "firebase/auth";
 import "firebase/firestore";
 import "firebase/database";
-import * as FirebaseConfig from "./FirebaseConfig"
+
 
 import {
   Button,
@@ -23,6 +24,7 @@ import {
   ListItem,
   UnorderedList,
 } from '@chakra-ui/react';
+
 
 
 // initialize firebase

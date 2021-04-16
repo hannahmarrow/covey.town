@@ -284,10 +284,10 @@ export default function UserProfile(): JSX.Element {
         await firebase.database().ref('users').child(user.uid).get().then((snapshot) => {
           if (snapshot.exists()) {
             if (snapshot.val().friendsRequestsSent !== null && snapshot.val().friendsRequestsSent !== undefined) {
-              currentFriendResquestsSent = snapshot.val().friendsRequestsSent;
+              currentFriendResquestsSent = getValuesFromFirebaseArray(snapshot.val().friendsRequestsSent);
             }
             if (snapshot.val().friendsList !== null && snapshot.val().friendsList !== undefined) {
-              currentFriendsList = snapshot.val().friendsList;
+              currentFriendsList = getValuesFromFirebaseArray(snapshot.val().friendsList);
             }
             if (snapshot.val().username !== null && snapshot.val().username !== undefined) {
               currentUsername = snapshot.val().username;
