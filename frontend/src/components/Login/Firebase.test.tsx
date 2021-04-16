@@ -15,10 +15,10 @@ import "firebase/database";
 import * as FirebaseConfig from "./FirebaseConfig"
 
 
-
+// adds mock data 
 describe('Firebase Tests', () => {
-    it("Tests Firebase Database", async () => {
-        
+    it("Tests Firebase Database Get", async () => {
+
       // initialize firebase
       if (!firebase.apps.length) {
         firebase.initializeApp(FirebaseConfig.firebaseConfig);
@@ -28,8 +28,25 @@ describe('Firebase Tests', () => {
       }
 
         
-    firebase.database().ref('test').set("test_val")
+    firebase.database().ref('test').set({ testval: "testval"})
     expect(firebase.database().ref('test').get()).resolves.not.toBeNull()
+    expect(firebase.database().ref('test').get()).resolves.toBe({ testval: "testval"})
 
     });
+
+    it("Tests Firebase Database Update", async () => {
+
+        // initialize firebase
+        if (!firebase.apps.length) {
+          firebase.initializeApp(FirebaseConfig.firebaseConfig);
+        }
+        else {
+          firebase.app();
+        }
+  
+          
+      firebase.database().ref('test').update({ testval: "new_test_val" })
+      expect(firebase.database().ref('test').get()).resolves.toBe({ testval: "new_test_val" })
+  
+      });
 })
