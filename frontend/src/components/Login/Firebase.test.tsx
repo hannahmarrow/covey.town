@@ -1,13 +1,4 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { ChakraProvider } from '@chakra-ui/react';
-import React from 'react';
-import '@testing-library/jest-dom'
-import { fireEvent, render, RenderResult, waitFor } from '@testing-library/react';
-import { nanoid } from 'nanoid';
-import { TargetElement } from '@testing-library/user-event';
-import TownSettings from './TownSettings';
-import TownsServiceClient from '../../classes/TownsServiceClient';
-import CoveyAppContext from '../../contexts/CoveyAppContext';
 import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
