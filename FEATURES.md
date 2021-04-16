@@ -23,3 +23,7 @@ section containing their new credentials. Similar to when a guest creates an acc
 Whether the user is using Covey.Town as a guest or an account holder, there is a log out button at the top right of the profile section, which logs the user out of
 the application and directs them to the log in screen. There is also a log out button next to the disconnect button when a user is in a room, which also logs them
 out of the application and directs them to the log in screen.
+
+## Note About User Stories
+
+In our original project pitch, one of our user stories was allowing users to add a profile picture to their account. We opted to not implement that user story and instead implemented the friends list functionality described above, which was not originally part of our user stories.
