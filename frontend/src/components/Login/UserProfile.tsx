@@ -33,6 +33,7 @@ else {
 }
 
 let username = '';
+let displayname = '';
 let friendRequestsSentNames: string[] = [];
 let friendRequestsRecievedNames: string[] = [];
 let friendNames: string[] = [];
@@ -117,7 +118,6 @@ export default function UserProfile(): JSX.Element {
   const [friendRequestsRecieved, setFriendRequestsRecieved] = useState<FriendList>([]);
   const [friends] = useState<FriendList>([]);
   const toast = useToast();
-  let displayname = '';
 
   // reads all the users data, sets
   const readUserData = useCallback(async () => {
@@ -199,7 +199,7 @@ export default function UserProfile(): JSX.Element {
       });
     }
 
-  }, []); 
+  }, [friendRequestsSent, friends, friendRequestsRecieved]); 
 
   // handles all logging out; resets data and de-auths firebase
   function logout() {
@@ -230,7 +230,7 @@ export default function UserProfile(): JSX.Element {
         setDisplayName(displayname);
       }
     });
-  }, [displayname, guest, readUserData, setDisplayName]);
+  }, [guest, readUserData, setDisplayName]);
 
   const updateFriendListing = useCallback(() => {
     readUserData().then(() => {
