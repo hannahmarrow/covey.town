@@ -45,7 +45,14 @@ Create a `.env` file in the `frontend` directory, with the line: `REACT_APP_TOWN
 
 In the `frontend` directory, run `npm start` (again, you'll need to run `npm install` the very first time). After several moments (or minutes, depending on the speed of your machine), a browser will open with the frontend running locally.
 The frontend will automatically re-compile and reload in your browser if you change any files in the `frontend/src` directory.
- 
+
+### Setting up Firebase
+
+When you run `npm install` in the `frontend` directory you will automatically install all of the dependencies for Firebase.
+If you'd like to set up your own Firebase Database you can go here: https://firebase.google.com/products-build.
+After creating it, you can connect it to your project by following the official Firebase documentation here: https://firebase.google.com/docs/web/setup.
+Once you set up Firebase, you can copy the created config json to the `FirebaseConfig.tsx` file in the project to fully setup your new database.
+
 ## Public Git Repository
 
 https://github.com/hannahmarrow/covey.town
